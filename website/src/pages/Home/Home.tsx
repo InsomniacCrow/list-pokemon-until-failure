@@ -6,7 +6,9 @@ import { PokemonBox } from "../../components";
 // import { POKEMON_DATA } from "@data/pokemondata";
 import { POKEMON_DATA, type PokemonInfo } from "../../data/pokemondata";
 
-const INITIAL_TIME = 5;
+const AUDIO_PATH = "src/assets/cries/latest/"
+
+const INITIAL_TIME = 60;
 const TIME_INCREASE_INTERVAL = 6;
 
 // nidoran edge cases bc they're weird
@@ -93,6 +95,8 @@ export default function Home() {
     setError(ERROR_STATES.NONE);
     setUsed(new BitSet(used.set(mon.id)));
     setPokemon((prev) => [...prev, monKey]);
+    const audio = new Audio(`${AUDIO_PATH}${mon.id}.ogg`);
+    audio.play();
   }
 
   function compareMon(input: string) {

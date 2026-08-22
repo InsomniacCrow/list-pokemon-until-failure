@@ -1,9 +1,29 @@
 @import "tailwindcss";
 @plugin "daisyui" {
-  themes: retro
-    /* light --default,
+  themes: retro;
+  /* light --default,
     dark --prefersdark; */
 }
 @theme {
   --font-silk: "Silkscreen", sans-serif;
+
+  --animate-hover: hover ease-in-out 0.9s infinite;
+
+  @keyframes hover {
+    0% {
+      transform: translateY(0px);
+    }
+    30% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-5px);
+    }
+    80% {
+      transform: translateY(0px);
+    }
+    100% {
+      transform: translateY(0px);
+    }
+  }
 }

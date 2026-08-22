@@ -122,9 +122,7 @@ export default function Home() {
         {/* reverse not working idk why rn */}
 
         {pokemon.toReversed().map((mon, index) => {
-          const data = POKEMON_DATA[mon];
-          console.log(mon, index);
-          return <PokemonBox key={index} {...data} />;
+          return <PokemonBox key={index} {...POKEMON_DATA[mon]} />;
         })}
       </div>
     </div>

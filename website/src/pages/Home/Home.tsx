@@ -1,21 +1,27 @@
 import { useState, useEffect } from "react";
-import { PokemonBox } from "../../components"; 
+import BitSet from "bitset";
+
+// import { PokemonBox } from "@components";
+import { PokemonBox } from "../../components";
+// import { POKEMON_DATA } from "@data/pokemondata";
 import { POKEMON_DATA } from "../../data/pokemondata";
 
 const TIME_INCREASE_INTERVAL = 6;
 
-// enum GAME_STATES {
-//   PLAYING = 1,
-//   ENDED = 2
-// }
-
+type GAME_STATES = {
+  UNSTARTED: "UNSTARTED";
+  PLAYING: "PLAYING";
+  ENDED: "ENDED";
+};
 
 export default function Home() {
   const [choice, setChoice] = useState("");
-  const [pokemon, setPokemon] = useState<Number[]>([]);
-  const [time, setTime] = useState<number>(10);
+  const [pokemon, setPokemon] = useState<string[]>([]);
+  const [time, setTime] = useState<number>(60);
   const [green, setGreen] = useState<boolean>(false);
   const [gameState, setGameState] = useState<boolean>(true);
+
+  const used = new BitSet();
 
   // after initial
   useEffect(() => {
@@ -36,6 +42,21 @@ export default function Home() {
   function increaseTime() {
     setTime((prev) => prev + TIME_INCREASE_INTERVAL);
     setGreen(true);
+  }
+
+  function compareMon(input: string) {
+    input = input.toLowerCase();
+    if (false) {
+      // TODO: nidoran edge case bc they suck
+    } else if (POKEMON_DATA.hasOwnProperty(input)) {
+      if (false) {
+        // TODO: check if exists already (with used)
+      }
+      setPokemon([...pokemon, POKEMON_DATA[input].name]);
+      increaseTime();
+      setChoice("");
+      // bitset action here
+    }
   }
 
   useEffect(() => {
@@ -93,18 +114,18 @@ export default function Home() {
         onChange={(e) => setChoice(e.target.value)}
         onKeyDown={(e) => {
           if (e.key === "Enter") {
-            if (true) {
-              setPokemon([...pokemon, 1]);
-              increaseTime();
-              setChoice("");
-            }
+            compareMon(choice);
           }
         }}
       />
       <div className="w-full px-20 flex overflow-x-clip flex-wrap mt-5 justify-start">
-        {pokemon.map((mon) => (
-          <PokemonBox number={mon.toString()} name={"Gouging Fire"} />
-        ))}
+        {/* reverse not working idk why rn */}
+
+        {pokemon.toReversed().map((mon, index) => {
+          const data = POKEMON_DATA[mon];
+          console.log(mon, index);
+          return <PokemonBox key={index} {...data} />;
+        })}
       </div>
     </div>
   );

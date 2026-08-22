@@ -1,0 +1,13 @@
+{
+  // Visit https://aka.ms/tsconfig to read more about this file
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "target": "ES2023",
+    "esModuleInterop": true,
+    "types": ["node"],
+    "ignoreDeprecations": "6.0"
+    
+
+  }
+}

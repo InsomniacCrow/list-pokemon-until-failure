@@ -1,4 +1,4 @@
-interface PokemonInfo {
+export interface PokemonInfo {
   id: number;
   name: string;
   generation: number;
@@ -124,7 +124,12 @@ export const POKEMON_DATA: {
     generation: 1,
     img: "031.png",
   },
-  "nidoran male": { id: 32, name: "nidoran♂", generation: 1, img: "032.png" },
+  "nidoran male": {
+    id: 32,
+    name: "nidoran♂",
+    generation: 1,
+    img: "032.png",
+  },
   nidorino: {
     id: 33,
     name: "nidorino",

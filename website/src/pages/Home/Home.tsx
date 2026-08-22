@@ -4,28 +4,58 @@ import BitSet from "bitset";
 // import { PokemonBox } from "@components";
 import { PokemonBox } from "../../components";
 // import { POKEMON_DATA } from "@data/pokemondata";
-import { POKEMON_DATA } from "../../data/pokemondata";
+import { POKEMON_DATA, type PokemonInfo } from "../../data/pokemondata";
 
+const AUDIO_PATH = "src/assets/cries/latest/"
+
+const INITIAL_TIME = 5;
 const TIME_INCREASE_INTERVAL = 6;
 
-type GAME_STATES = {
-  UNSTARTED: "UNSTARTED";
-  PLAYING: "PLAYING";
-  ENDED: "ENDED";
+// nidoran edge cases bc they're weird
+const NIDORAN_EQUIVALENTS = ["nidoran"];
+const NIDORAN_FEMALE_EQUIVALENTS = ["nidoran female", "nidoran♀"];
+const NIDORAN_MALE_EQUIVALENTS = ["nidoran male", "nidoran♂"];
+
+const NIDORAN_MALE_KEY = "nidoran male";
+const NIDORAN_FEMALE_KEY = "nidoran female";
+
+const GAME_STATES = {
+  UNSTARTED: "UNSTARTED",
+  PLAYING: "PLAYING",
+  ENDED: "ENDED",
 };
+type GAME_STATES = (typeof GAME_STATES)[keyof typeof GAME_STATES];
+
+const ERROR_STATES = {
+  NONE: "Meow.",
+  DUPLICATE: "You've already said that pokémon.",
+  INVALID: "I don't know that pokémon. Check your spelling?",
+  NIDORAN: "Nidoran is weird. Um, take both.",
+};
+type ERROR_STATES = (typeof ERROR_STATES)[keyof typeof ERROR_STATES];
 
 export default function Home() {
   const [choice, setChoice] = useState("");
   const [pokemon, setPokemon] = useState<string[]>([]);
-  const [time, setTime] = useState<number>(60);
+  const [time, setTime] = useState<number>(INITIAL_TIME);
   const [green, setGreen] = useState<boolean>(false);
-  const [gameState, setGameState] = useState<boolean>(true);
+  const [gameState, setGameState] = useState<GAME_STATES>(
+    GAME_STATES.UNSTARTED,
+  );
+  const [error, setError] = useState<ERROR_STATES>(ERROR_STATES.NONE);
+  const [used, setUsed] = useState<BitSet>(new BitSet());
 
-  const used = new BitSet();
+  function wasUsed(id: number) {
+    return used.get(id) === 1 ? true : false;
+  }
 
   // after initial
   useEffect(() => {
+    if (gameState !== GAME_STATES.PLAYING) {
+      return;
+    }
     if (time <= 0) {
+      setGameState(GAME_STATES.ENDED);
       return;
     }
 
@@ -37,29 +67,6 @@ export default function Home() {
       clearInterval(timer);
     };
   }, [time]);
-
-  // janky rn but idc
-  function increaseTime() {
-    setTime((prev) => prev + TIME_INCREASE_INTERVAL);
-    setGreen(true);
-  }
-
-  function compareMon(input: string) {
-    input = input.toLowerCase();
-    if (false) {
-      // TODO: nidoran edge case bc they suck
-    } else if (POKEMON_DATA.hasOwnProperty(input)) {
-      if (false) {
-        // TODO: check if exists already (with used)
-      }
-      setPokemon([...pokemon, POKEMON_DATA[input].name]);
-      var audio = new Audio(`src/assets/cries/latest/${POKEMON_DATA[input].id}.ogg`);
-      audio.play();
-      increaseTime();
-      setChoice("");
-      // bitset action here
-    }
-  }
 
   useEffect(() => {
     if (!green) {
@@ -74,6 +81,77 @@ export default function Home() {
       clearInterval(timer);
     };
   }, [green]);
+
+  // janky rn but idc
+  function increaseTime() {
+    setTime((prev) => prev + TIME_INCREASE_INTERVAL);
+    setGreen(true);
+  }
+
+  function handleCorrectMon(mon: PokemonInfo, monKey: string) {
+    increaseTime();
+    setChoice("");
+    setGameState(GAME_STATES.PLAYING);
+    setError(ERROR_STATES.NONE);
+    setUsed(new BitSet(used.set(mon.id)));
+    setPokemon((prev) => [...prev, monKey]);
+    const audio = new Audio(`${AUDIO_PATH}${mon.id}.ogg`);
+    audio.play();
+  }
+
+  function compareMon(input: string) {
+    input = input.toLowerCase();
+    // there's sooo much duplication but I am a bit tired sorry
+    // START Nidoran Section
+    if (NIDORAN_EQUIVALENTS.includes(input)) {
+      if (
+        wasUsed(POKEMON_DATA[NIDORAN_MALE_KEY].id) &&
+        wasUsed(POKEMON_DATA[NIDORAN_FEMALE_KEY].id)
+      ) {
+        setError(ERROR_STATES.DUPLICATE);
+        return;
+      }
+      if (!wasUsed(POKEMON_DATA[NIDORAN_FEMALE_KEY].id)) {
+        handleCorrectMon(POKEMON_DATA[NIDORAN_FEMALE_KEY], NIDORAN_FEMALE_KEY);
+      }
+      if (!wasUsed(POKEMON_DATA[NIDORAN_MALE_KEY].id)) {
+        handleCorrectMon(POKEMON_DATA[NIDORAN_MALE_KEY], NIDORAN_MALE_KEY);
+      }
+      setError(ERROR_STATES.NIDORAN);
+    } else if (NIDORAN_FEMALE_EQUIVALENTS.includes(input)) {
+      if (!wasUsed(POKEMON_DATA[NIDORAN_FEMALE_KEY].id)) {
+        handleCorrectMon(POKEMON_DATA[NIDORAN_FEMALE_KEY], NIDORAN_FEMALE_KEY);
+      } else {
+        setError(ERROR_STATES.DUPLICATE);
+        return;
+      }
+    } else if (NIDORAN_MALE_EQUIVALENTS.includes(input)) {
+      if (!wasUsed(POKEMON_DATA[NIDORAN_MALE_KEY].id)) {
+        handleCorrectMon(POKEMON_DATA[NIDORAN_MALE_KEY], NIDORAN_MALE_KEY);
+      } else {
+        setError(ERROR_STATES.DUPLICATE);
+        return;
+      }
+      // END Nidoran Section
+    } else if (POKEMON_DATA.hasOwnProperty(input)) {
+      if (wasUsed(POKEMON_DATA[input].id)) {
+        setError(ERROR_STATES.DUPLICATE);
+        return;
+      }
+      handleCorrectMon(POKEMON_DATA[input], input);
+    } else {
+      setError(ERROR_STATES.INVALID);
+    }
+  }
+
+  function resetGame() {
+    setGameState(GAME_STATES.UNSTARTED);
+    setError(ERROR_STATES.NONE);
+    setChoice("");
+    setTime(INITIAL_TIME);
+    setPokemon([]);
+    setUsed(new BitSet());
+  }
 
   return (
     <div className="flex flex-col justify-center items-center py-5 w-screen overflow-clip">
@@ -99,15 +177,9 @@ export default function Home() {
           {time % 60}
         </span>
       </span>
-      <p className="mt-3">Input.</p>
-      <div
-        className="btn font-silk"
-        onClick={(e) => {
-          increaseTime();
-        }}
-      >
-        Increase time
-      </div>
+      <p className={`mt-1 ${error === ERROR_STATES.NONE ? "hidden" : ""}`}>
+        {error}
+      </p>
       <input
         type="text"
         placeholder="I choose..."
@@ -119,7 +191,27 @@ export default function Home() {
             compareMon(choice);
           }
         }}
+        disabled={gameState === GAME_STATES.ENDED}
       />
+      {gameState === GAME_STATES.ENDED ? (
+        <div
+          className="btn font-silk"
+          onClick={(e) => {
+            resetGame();
+          }}
+        >
+          Try Again?
+        </div>
+      ) : (
+        <div
+          className="btn font-silk"
+          onClick={(e) => {
+            increaseTime();
+          }}
+        >
+          Increase time
+        </div>
+      )}
       <div className="w-full px-20 flex overflow-x-clip flex-wrap mt-5 justify-start">
         {pokemon.toReversed().map((mon, index) => (
           <PokemonBox key={index} {...POKEMON_DATA[mon]} />

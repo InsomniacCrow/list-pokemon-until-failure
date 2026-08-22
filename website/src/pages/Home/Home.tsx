@@ -4,9 +4,9 @@ import BitSet from "bitset";
 // import { PokemonBox } from "@components";
 import { PokemonBox } from "../../components";
 // import { POKEMON_DATA } from "@data/pokemondata";
-import { POKEMON_DATA } from "../../data/pokemondata";
+import { POKEMON_DATA, type PokemonInfo } from "../../data/pokemondata";
 
-const INITIAL_TIME = 10;
+const INITIAL_TIME = 5;
 const TIME_INCREASE_INTERVAL = 6;
 
 // nidoran edge cases bc they're weird
@@ -41,8 +41,11 @@ export default function Home() {
     GAME_STATES.UNSTARTED,
   );
   const [error, setError] = useState<ERROR_STATES>(ERROR_STATES.NONE);
+  const [used, setUsed] = useState<BitSet>(new BitSet());
 
-  const used = new BitSet();
+  function wasUsed(id: number) {
+    return used.get(id) === 1 ? true : false;
+  }
 
   // after initial
   useEffect(() => {
@@ -83,32 +86,55 @@ export default function Home() {
     setGreen(true);
   }
 
-  function handleCorrectMon() {
+  function handleCorrectMon(mon: PokemonInfo, monKey: string) {
     increaseTime();
     setChoice("");
     setGameState(GAME_STATES.PLAYING);
     setError(ERROR_STATES.NONE);
-    // bitset action here
+    setUsed(new BitSet(used.set(mon.id)));
+    setPokemon((prev) => [...prev, monKey]);
   }
 
   function compareMon(input: string) {
     input = input.toLowerCase();
+    // there's sooo much duplication but I am a bit tired sorry
+    // START Nidoran Section
     if (NIDORAN_EQUIVALENTS.includes(input)) {
-      handleCorrectMon();
-      setError(ERROR_STATES.NIDORAN);
-      setPokemon([...pokemon, NIDORAN_MALE_KEY, NIDORAN_FEMALE_KEY]);
-    } else if (NIDORAN_FEMALE_EQUIVALENTS.includes(input)) {
-      handleCorrectMon();
-      setPokemon([...pokemon, NIDORAN_FEMALE_KEY]);
-    } else if (NIDORAN_MALE_EQUIVALENTS.includes(input)) {
-      handleCorrectMon();
-      setPokemon([...pokemon, NIDORAN_MALE_KEY]);
-    } else if (POKEMON_DATA.hasOwnProperty(input)) {
-      if (false) {
-        // TODO: check if exists already (with used)
+      if (
+        wasUsed(POKEMON_DATA[NIDORAN_MALE_KEY].id) &&
+        wasUsed(POKEMON_DATA[NIDORAN_FEMALE_KEY].id)
+      ) {
+        setError(ERROR_STATES.DUPLICATE);
+        return;
       }
-      setPokemon([...pokemon, POKEMON_DATA[input].name]);
-      handleCorrectMon();
+      if (!wasUsed(POKEMON_DATA[NIDORAN_FEMALE_KEY].id)) {
+        handleCorrectMon(POKEMON_DATA[NIDORAN_FEMALE_KEY], NIDORAN_FEMALE_KEY);
+      }
+      if (!wasUsed(POKEMON_DATA[NIDORAN_MALE_KEY].id)) {
+        handleCorrectMon(POKEMON_DATA[NIDORAN_MALE_KEY], NIDORAN_MALE_KEY);
+      }
+      setError(ERROR_STATES.NIDORAN);
+    } else if (NIDORAN_FEMALE_EQUIVALENTS.includes(input)) {
+      if (!wasUsed(POKEMON_DATA[NIDORAN_FEMALE_KEY].id)) {
+        handleCorrectMon(POKEMON_DATA[NIDORAN_FEMALE_KEY], NIDORAN_FEMALE_KEY);
+      } else {
+        setError(ERROR_STATES.DUPLICATE);
+        return;
+      }
+    } else if (NIDORAN_MALE_EQUIVALENTS.includes(input)) {
+      if (!wasUsed(POKEMON_DATA[NIDORAN_MALE_KEY].id)) {
+        handleCorrectMon(POKEMON_DATA[NIDORAN_MALE_KEY], NIDORAN_MALE_KEY);
+      } else {
+        setError(ERROR_STATES.DUPLICATE);
+        return;
+      }
+      // END Nidoran Section
+    } else if (POKEMON_DATA.hasOwnProperty(input)) {
+      if (wasUsed(POKEMON_DATA[input].id)) {
+        setError(ERROR_STATES.DUPLICATE);
+        return;
+      }
+      handleCorrectMon(POKEMON_DATA[input], input);
     } else {
       setError(ERROR_STATES.INVALID);
     }
@@ -120,6 +146,7 @@ export default function Home() {
     setChoice("");
     setTime(INITIAL_TIME);
     setPokemon([]);
+    setUsed(new BitSet());
   }
 
   return (

@@ -70,7 +70,7 @@ export default function Home() {
       </span>
       <p className="mt-3">Input.</p>
       <div
-        className="btn"
+        className="btn font-silk"
         onClick={(e) => {
           increaseTime();
         }}
@@ -92,7 +92,7 @@ export default function Home() {
       />
       <div className="w-full px-20 flex overflow-x-clip flex-wrap mt-5 justify-start">
         {pokemon.map((mon) => (
-          <PokemonBox name={mon.toString()} />
+          <PokemonBox number={mon.toString()} name={"Fletchinder"} />
         ))}
       </div>
     </div>

@@ -3,11 +3,18 @@ import { PokemonBox } from "../../components";
 
 const TIME_INCREASE_INTERVAL = 6;
 
+enum GAME_STATES {
+  PLAYING = 1,
+  ENDED = 2
+}
+
+
 export default function Home() {
   const [choice, setChoice] = useState("");
   const [pokemon, setPokemon] = useState<Number[]>([]);
-  const [time, setTime] = useState<number>(60);
+  const [time, setTime] = useState<number>(10);
   const [green, setGreen] = useState<boolean>(false);
+  const [gameState, setGameState] = useState<boolean>(true);
 
   // after initial
   useEffect(() => {
@@ -85,8 +92,11 @@ export default function Home() {
         onChange={(e) => setChoice(e.target.value)}
         onKeyDown={(e) => {
           if (e.key === "Enter") {
-            setPokemon([...pokemon, 1]);
-            setChoice("");
+            if (true) {
+              setPokemon([...pokemon, 1]);
+              increaseTime();
+              setChoice("");
+            }
           }
         }}
       />

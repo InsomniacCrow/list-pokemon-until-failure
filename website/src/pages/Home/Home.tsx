@@ -119,11 +119,9 @@ export default function Home() {
         }}
       />
       <div className="w-full px-20 flex overflow-x-clip flex-wrap mt-5 justify-start">
-        {/* reverse not working idk why rn */}
-
-        {pokemon.toReversed().map((mon, index) => {
-          return <PokemonBox key={index} {...POKEMON_DATA[mon]} />;
-        })}
+        {pokemon.toReversed().map((mon, index) => (
+          <PokemonBox key={index} {...POKEMON_DATA[mon]} />
+        ))}
       </div>
     </div>
   );

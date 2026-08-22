@@ -1,16 +1,16 @@
-import fs from 'node:fs';
+import fs from "node:fs";
 
 interface aaa {
-  id: string | number,
-  name: string,
-  generation: string | number
+  id: string | number;
+  name: string;
+  generation: string | number;
 }
 
 interface pokemondata {
-  id: string | number,
-  name: string,
-  generation: string | number,
-  img: string
+  id: string | number;
+  name: string;
+  generation: string | number;
+  img: string;
 }
 
 var data: aaa[] = [
@@ -5142,7 +5142,7 @@ var data: aaa[] = [
 ];
 
 var myfuckingObject: {
-  [index: string]: pokemondata
+  [index: string]: pokemondata;
 } = {};
 
 var stupid: aaa[] = [];
@@ -5156,13 +5156,17 @@ var stupid: aaa[] = [];
 // }
 
 for (const entry of data) {
-  const numericalId = typeof entry.id === "string" ? parseInt(entry.id) : entry.id;
+  const numericalId =
+    typeof entry.id === "string" ? parseInt(entry.id) : entry.id;
   myfuckingObject[entry.name.toLowerCase()] = {
-    id: (typeof entry.id === "string" ? parseInt(entry.id) : entry.id),
+    id: typeof entry.id === "string" ? parseInt(entry.id) : entry.id,
     name: entry.name.toLowerCase(),
-    generation: (typeof entry.generation === "string" ? parseInt(entry.generation) : entry.generation),
-    img: `${numericalId < 10 ? "00" : numericalId < 100 ? "0" : ""}${numericalId}.png`
-  }
+    generation:
+      typeof entry.generation === "string"
+        ? parseInt(entry.generation)
+        : entry.generation,
+    img: `${numericalId < 10 ? "00" : numericalId < 100 ? "0" : ""}${numericalId}.png`,
+  };
 }
 
 // data.map((entry) => {
@@ -5173,7 +5177,7 @@ for (const entry of data) {
 //   }
 // });
 
-fs.writeFile('pokemondata.json', JSON.stringify(myfuckingObject), err => {
+fs.writeFile("pokemondata.json", JSON.stringify(myfuckingObject), (err) => {
   if (err) {
     console.error(err);
   } else {

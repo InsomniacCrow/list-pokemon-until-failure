@@ -28,7 +28,7 @@ export default function ({
         />
       </div>
       <div className="w-full flex items-center justify-center">
-        <p className="font-silk">{name.toUpperCase()}</p>
+        <p className="font-silk text-center">{name.toUpperCase()}</p>
       </div>
     </div>
   );

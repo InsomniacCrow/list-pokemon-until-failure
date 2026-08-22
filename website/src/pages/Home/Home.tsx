@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
-import { PokemonBox } from "../../components";
+import { PokemonBox } from "../../components"; 
+import { POKEMON_DATA } from "../../data/pokemondata";
 
 const TIME_INCREASE_INTERVAL = 6;
 
-enum GAME_STATES {
-  PLAYING = 1,
-  ENDED = 2
-}
+// enum GAME_STATES {
+//   PLAYING = 1,
+//   ENDED = 2
+// }
 
 
 export default function Home() {
@@ -56,7 +57,7 @@ export default function Home() {
       <h1 className="text-4xl p-5 font-bold">list pokémon until failure</h1>
       <p className="text-xl">Score: {pokemon.length}</p>
       <span
-        className={`font-mono text-2xl py-4 transition ${green ? "text-green-600" : false ? "text-red-500" : ""}`}
+        className={`font-mono text-2xl py-4 transition ${green ? "text-green-600" : time <= 10 ? "text-red-700" : ""}`}
       >
         <span
           style={{ "--value": Math.floor(time / 60) } as React.CSSProperties}
@@ -102,7 +103,7 @@ export default function Home() {
       />
       <div className="w-full px-20 flex overflow-x-clip flex-wrap mt-5 justify-start">
         {pokemon.map((mon) => (
-          <PokemonBox number={mon.toString()} name={"Fletchinder"} />
+          <PokemonBox number={mon.toString()} name={"Gouging Fire"} />
         ))}
       </div>
     </div>

@@ -89,12 +89,12 @@ export default function Home() {
   }
 
   function handleCorrectMon(mon: PokemonInfo, monKey: string) {
-    increaseTime();
     setChoice("");
+    setPokemon((prev) => [...prev, monKey]);
     setGameState(GAME_STATES.PLAYING);
     setError(ERROR_STATES.NONE);
+    increaseTime();
     setUsed(new BitSet(used.set(mon.id)));
-    setPokemon((prev) => [...prev, monKey]);
     const audio = new Audio(`${AUDIO_PATH}${mon.id}.ogg`);
     audio.play();
   }

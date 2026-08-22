@@ -8,7 +8,7 @@ import { POKEMON_DATA, type PokemonInfo } from "../../data/pokemondata";
 
 const AUDIO_PATH = "src/assets/cries/latest/"
 
-const INITIAL_TIME = 5;
+const INITIAL_TIME = 60;
 const TIME_INCREASE_INTERVAL = 6;
 
 // nidoran edge cases bc they're weird

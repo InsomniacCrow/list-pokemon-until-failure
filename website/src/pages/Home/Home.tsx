@@ -53,6 +53,8 @@ export default function Home() {
         // TODO: check if exists already (with used)
       }
       setPokemon([...pokemon, POKEMON_DATA[input].name]);
+      var audio = new Audio(`src/assets/cries/latest/${POKEMON_DATA[input].id}.ogg`);
+      audio.play();
       increaseTime();
       setChoice("");
       // bitset action here

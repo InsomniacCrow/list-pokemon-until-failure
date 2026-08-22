@@ -1,14 +1,9 @@
-// function getImageUrl(name: string): URL {
-//   // change URL here, so doesn't die in production
-//   console.log(name);
-//   const thing = new URL(`./../assets/pkmn_images/${name}`, import.meta.url)
-//     .href;
-//   console.log(thing);
-//   console.log(gallery);
-//   return new URL(`./../assets/pkmn_images/${name}`, import.meta.url).href;
-// }
-import { idImageMapping } from "../assets";
 // import { idImageMapping } from "@assets";
+import { idImageMapping } from "../assets";
+
+// I got lazy and just specified it. It's possible it would go badly with Vite anyway. 
+//import { pokeball } from "@assets";
+import { pokeball } from "../assets";
 
 export default function ({
   id,
@@ -20,7 +15,10 @@ export default function ({
   img: string;
 }) {
   return (
-    <div className="border w-34 h-34 rounded-md flex flex-col justify-between pb-2 mx-2 my-2 bg-base-200">
+    <div
+      className={`shadow-sm border w-34 h-34 rounded-md flex flex-col justify-between pb-2 mx-2 my-2 
+        bg-base-200 bg-[url(src/assets/pokeball.png)] bg-size-[80%] bg-center bg-no-repeat`}
+    >
       <p className="text-sm p-1 font-silk opacity-50">#{id}</p>
       <div className="p-1 text-xs flex justify-center">
         <img

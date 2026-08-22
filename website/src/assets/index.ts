@@ -1,14 +1,14 @@
-//const BASE_IMG_PATH = "./../assets/";
+import pokeball from "./pokeball.png";
 
 var idImageMapping: {
   [index: string]: string;
 } = {};
 
 // Mapping from id to full image location
-const gallery = Object.values(
+const gallery = Object.keys(
   import.meta.glob("@assets/pkmn_images/*.{png,jpg,jpeg,PNG,JPEG}", {
     eager: true,
-    as: "url",
+    query: "?url",
   }),
 );
 
@@ -20,4 +20,4 @@ for (const entry of gallery) {
   }
 }
 
-export { idImageMapping };
+export { idImageMapping, pokeball };
